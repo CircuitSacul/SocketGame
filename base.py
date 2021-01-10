@@ -46,4 +46,7 @@ class Base:
             return
 
         for func in self.events[name]:
-            await func(con, data)
+            try:
+                await func(con, data)
+            except Exception as e:
+                print(type(e), e)

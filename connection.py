@@ -56,9 +56,13 @@ class Connection:
             await self._send(to_send)
 
     async def _send(self, to_send: str) -> None:
+        to_send.replace('|', '')
+        to_send += '|'
         self.writer.write(to_send.encode())
         await self.writer.drain()
 
     async def _read(self) -> Any:
-        recv = await self.reader.read(100)
-        return json.loads(recv)
+        data = (await self.reader.readuntil(b'|')).decode()
+        data = data[0:len(data)-1]
+        print(data)
+        return json.loads(data)
