@@ -4,7 +4,7 @@ from server import Server
 server = Server()
 
 game_data = {'players': {}}
-# Structure: {'players': [{'x': x_pos, 'y': y_pos}, ...]}
+# Structure: {'players': {id: {'x': x_pos, 'y': y_pos}, ...}}
 
 
 @server.on_connection
