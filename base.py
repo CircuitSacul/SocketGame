@@ -1,5 +1,5 @@
 import asyncio
-from typing import Dict, Any
+from typing import Dict, List, Any
 
 
 class Base:
@@ -16,17 +16,25 @@ class Base:
         self.loop = loop or asyncio.get_event_loop()
 
         self.events: Dict[str, callable] = {}
+        self.tasks: List[callable] = []
+
+    def task(self, func: callable) -> None:
+        self.tasks.append(func)
 
     def event(self, name: str = None) -> callable:
-        def wrapper(func: callable, *args, **kwargs) -> callable:
+        def wrapper(func: callable) -> callable:
             event_name = name or func.__name__
 
             self.events.setdefault(event_name, [])
             self.events[event_name].append(func)
 
-            return func(*args, **kwargs)
+            return func
 
         return wrapper
+
+    async def start_tasks(self) -> None:
+        for func in self.tasks:
+            self.loop.create_task(func())
 
     async def process_event(
         self,

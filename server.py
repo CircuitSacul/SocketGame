@@ -10,15 +10,26 @@ class Server(Base):
         super().__init__(*args, **kwargs)
 
         self.clients: List[Connection] = []
+        self._on_connect: callable = None
+
+        self._current_id: int = 0
+
+    def on_connection(self, func: callable) -> None:
+        self._on_connect = func
 
     def run(self) -> None:
         self.loop.run_until_complete(self.start())
+
+    def _get_id(self) -> None:
+        self._current_id += 1
+        return self._current_id - 1
 
     async def start(self) -> None:
         await asyncio.start_server(
             self._connect_callaback,
             self.host, self.port, loop=self.loop
         )
+        await self.start_tasks()
         await self.main_loop()
 
     async def main_loop(self) -> None:
@@ -41,5 +52,8 @@ class Server(Base):
         writer: asyncio.StreamWriter
     ) -> None:
         con = Connection(self.loop, reader, writer)
+        con.id = self._get_id()
         con.start()
+        con.send('set_id', con.id, event_type='system')
         self.clients.append(con)
+        await self._on_connect(con)

@@ -8,7 +8,8 @@ class Connection:
         self,
         loop: asyncio.AbstractEventLoop,
         reader: asyncio.StreamReader,
-        writer: asyncio.StreamWriter
+        writer: asyncio.StreamWriter,
+        begins: bool = False
     ) -> None:
         self.reader = reader
         self.writer = writer
@@ -17,6 +18,9 @@ class Connection:
         self._send_queue = []
 
         self.loop = loop
+
+        self.id = None
+        self.begins = begins
 
     def send(
         self,
@@ -38,19 +42,18 @@ class Connection:
         self.loop.create_task(self._main_loop())
 
     async def _main_loop(self) -> None:
+        if self.begins:
+            await self._send("{}")
         while True:
-            print(1)
+            recv = await self._read()
+            if recv != {}:
+                self._recv_queue.append(recv)
+
             to_send = "{}"
             if len(self._send_queue) != 0:
                 to_send = self._send_queue.pop(0)
 
             await self._send(to_send)
-
-            recv = await self._read()
-            if recv != {}:
-                self._recv_queue.append(recv)
-
-            await asyncio.sleep(0)
 
     async def _send(self, to_send: str) -> None:
         self.writer.write(to_send.encode())
