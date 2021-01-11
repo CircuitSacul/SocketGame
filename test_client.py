@@ -12,8 +12,11 @@ pygame.init()
 
 game_data = None
 
+host = input("Server IP Address: ")
+port = int(input("Server Port Number: "))
 
-client = Client()
+
+client = Client(host=host, port=port)
 
 
 def draw() -> None:

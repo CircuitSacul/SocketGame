@@ -19,6 +19,8 @@ class Connection:
 
         self.loop = loop
 
+        self.running = True
+
         self.id = None
         self.begins = begins
 
@@ -45,7 +47,11 @@ class Connection:
         if self.begins:
             await self._send("{}")
         while True:
-            recv = await self._read()
+            try:
+                recv = await self._read()
+            except ConnectionResetError:
+                self.running = False
+                break
             if recv != {}:
                 self._recv_queue.append(recv)
 
@@ -62,7 +68,9 @@ class Connection:
         await self.writer.drain()
 
     async def _read(self) -> Any:
-        data = (await self.reader.readuntil(b'|')).decode()
+        try:
+            data = (await self.reader.readuntil(b'|')).decode()
+        except Exception as e:
+            raise ConnectionResetError from e
         data = data[0:len(data)-1]
-        print(data)
         return json.loads(data)

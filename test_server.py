@@ -7,10 +7,21 @@ game_data = {'players': {}}
 # Structure: {'players': {id: {'x': x_pos, 'y': y_pos}, ...}}
 
 
+@server.on_ready
+async def on_ready() -> None:
+    print(f"Server open at {server.host}:{server.port}")
+
+
 @server.on_connection
 async def on_connect(con) -> None:
     game_data['players'][con.id] = {'x': 0, 'y': 0}
-    print("Received connection:", con)
+    print("Client Connected:", con.id)
+
+
+@server.on_disconnect
+async def on_disconnect(con) -> None:
+    del game_data['players'][con.id]
+    print("Client Disconnected:", con.id)
 
 
 @server.event(name='move')
