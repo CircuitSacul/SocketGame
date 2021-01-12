@@ -60,6 +60,7 @@ class Connection:
                 to_send = self._send_queue.pop(0)
 
             await self._send(to_send)
+            await asyncio.sleep(0.001)
 
     async def _send(self, to_send: str) -> None:
         to_send.replace('|', '')

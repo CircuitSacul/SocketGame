@@ -1,7 +1,11 @@
 import asyncio
 from server import Server
 
-server = Server()
+
+host = input("Host: ")
+port = int(input("Port: "))
+
+server = Server(host=host, port=port)
 
 game_data = {'players': {}}
 # Structure: {'players': {id: {'x': x_pos, 'y': y_pos}, ...}}
