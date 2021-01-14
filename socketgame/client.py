@@ -1,6 +1,6 @@
 import asyncio
-from base import Base
-from connection import Connection
+from .base import Base
+from .connection import Connection
 
 
 class Client(Base):

@@ -1,8 +1,8 @@
 import asyncio
 from typing import List
 
-from base import Base
-from connection import Connection
+from .base import Base
+from .connection import Connection
 
 
 class Server(Base):

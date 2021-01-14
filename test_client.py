@@ -3,7 +3,7 @@ import sys
 
 import pygame
 
-from client import Client
+from socketgame.client import Client
 
 
 SCREEN = pygame.display.set_mode((500, 500))

@@ -1,5 +1,6 @@
 import asyncio
-from server import Server
+
+from socketgame.server import Server
 
 
 host = input("Host: ")
