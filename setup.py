@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="socketgame",
     version="1.0.1",
-    description="Read the latest Real Python tutorials",
+    description="Create fast LAN games easily",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/CircuitSacul/SocketGame",
