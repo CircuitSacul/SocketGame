@@ -1,5 +1,5 @@
 import asyncio
-from typing import List
+from typing import List, Optional, Any
 
 from .base import Base
 from .connection import Connection
@@ -16,6 +16,15 @@ class Server(Base):
 
         self._current_id: int = 0
 
+    def get_client(self, client_id: int) -> Optional[Connection]:
+        for c in self.clients:
+            if c.id == client_id:
+                return c
+
+    def send_to_all(self, event: str, data: Any) -> None:
+        for c in self.clients:
+            c.send(event, data)
+
     def on_connection(self, func: callable) -> None:
         self._on_connect = func
 
@@ -26,7 +35,17 @@ class Server(Base):
         self._on_ready = func
 
     def run(self) -> None:
-        self.loop.run_until_complete(self.start())
+        try:
+            self.loop.run_until_complete(self.start())
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.loop.run_until_complete(self.stop())
+
+    async def stop(self) -> None:
+        self.stop_tasks()
+        for c in self.clients:
+            await c.stop()
 
     def _get_id(self) -> None:
         self._current_id += 1

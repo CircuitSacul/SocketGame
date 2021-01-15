@@ -24,6 +24,8 @@ class Connection:
         self.id = None
         self.begins = begins
 
+        self._loop_task = None
+
     def send(
         self,
         event_name: str,
@@ -35,13 +37,23 @@ class Connection:
             'data': data
         }))
 
+    async def stop(self) -> None:
+        if self._loop_task:
+            if not self._loop_task.cancelled():
+                self._loop_task.cancel()
+        self.writer.close()
+        try:
+            await self.writer.wait_closed()
+        except ConnectionResetError:
+            pass
+
     def read(self) -> Any:
         if len(self._recv_queue) == 0:
             return None
         return self._recv_queue.pop(0)
 
     def start(self) -> None:
-        self.loop.create_task(self._main_loop())
+        self._loop_task = self.loop.create_task(self._main_loop())
 
     async def _main_loop(self) -> None:
         if self.begins:

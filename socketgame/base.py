@@ -17,6 +17,8 @@ class Base:
 
         self.events: Dict[str, callable] = {}
         self.tasks: List[callable] = []
+        
+        self._running_tasks: List[asyncio.Future] = []
 
     def task(self, func: callable) -> None:
         self.tasks.append(func)
@@ -34,7 +36,13 @@ class Base:
 
     async def start_tasks(self) -> None:
         for func in self.tasks:
-            self.loop.create_task(func())
+            t = self.loop.create_task(func())
+            self._running_tasks.append(t)
+
+    def stop_tasks(self) -> None:
+        for t in self._running_tasks:
+            if not t.cancelled():
+                t.cancel()
 
     async def process_event(
         self,
