@@ -60,7 +60,7 @@ async def game_loop() -> None:
             x = 1
 
         if any([x != 0, y != 0]):
-            client.server.send('move', {'x': x, 'y': y})
+            client.send('move', {'x': x, 'y': y})
 
         draw()
         await asyncio.sleep(0.01)

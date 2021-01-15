@@ -45,8 +45,7 @@ async def on_player_move(con, data) -> None:
 @server.task
 async def send_data() -> None:
     while True:
-        for client in server.clients:
-            client.send('set_data', game_data)
+        server.send_to_all('set_data', game_data)
         await asyncio.sleep(0.01)
 
 
