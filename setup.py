@@ -1,22 +1,28 @@
-import setuptools
+import pathlib
+from setuptools import setup
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+# The directory containing this file
+HERE = pathlib.Path(__file__).parent
 
-setuptools.setup(
-    name="socketgame-CircuitSacul",
-    version="0.0.1",
-    author="Lucas D",
-    author_email="circuitsacul@gmail.com",
-    description="A package for creating easy LAN games with asyncio",
-    long_description=long_description,
+# The text of the README file
+README = (HERE / "README.md").read_text()
+
+# This call to setup() does all the work
+setup(
+    name="socketgame",
+    version="1.0.0",
+    description="Read the latest Real Python tutorials",
+    long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/CircuitSacul/SocketGame",
-    packages=setuptools.find_packages(),
+    author="Lucas D",
+    author_email="circuitsacul@gmail.com",
+    license="MIT",
     classifiers=[
-        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
     ],
-    python_requires='>=3.7',
+    packages=["socketgame"],
+    include_package_data=True,
 )
