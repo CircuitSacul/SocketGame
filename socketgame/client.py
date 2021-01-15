@@ -35,6 +35,7 @@ class Client(Base):
     async def stop(self) -> None:
         self.stop_tasks()
         await self.server.stop()
+        exit(-1)
 
     async def main_loop(self) -> None:
         while True:

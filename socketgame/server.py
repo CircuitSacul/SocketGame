@@ -46,6 +46,7 @@ class Server(Base):
         self.stop_tasks()
         for c in self.clients:
             await c.stop()
+        exit(-1)
 
     def _get_id(self) -> None:
         self._current_id += 1
