@@ -75,8 +75,6 @@ class Connection:
             await asyncio.sleep(0.001)
 
     async def _send(self, to_send: str) -> None:
-        to_send.replace('|', '')
-        to_send += '|'
         self.writer.write(to_send.encode())
         await self.writer.drain()
 
