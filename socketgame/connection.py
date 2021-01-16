@@ -81,9 +81,11 @@ class Connection:
     async def _read(self) -> Any:
         data = bytearray()
         try:
-            chunk = await self.reader.read(100)
-            if chunk:
+            while True:
+                chunk = await self.reader.read(100)
                 data += chunk
+                if len(chunk) < 100:
+                    break
         except Exception as e:
             raise ConnectionResetError from e
         return json.loads(data)
