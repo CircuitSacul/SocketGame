@@ -12,6 +12,11 @@ class Client(Base):
         self.server: Connection = None
         self.id: int = None
 
+        self._on_ready = None
+
+    def on_ready(self, func: callable) -> None:
+        self._on_ready = func
+
     def send(self, event: str, data: Any) -> None:
         self.server.send(event, data)
 
@@ -30,6 +35,8 @@ class Client(Base):
         self.server = Connection(self.loop, reader, writer, begins=True)
         self.server.start()
         await self.start_tasks()
+        if self._on_ready:
+            await self._on_ready()
         await self.main_loop()
 
     async def stop(self) -> None:
