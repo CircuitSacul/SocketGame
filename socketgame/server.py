@@ -58,8 +58,7 @@ class Server(Base):
             self.host, self.port, loop=self.loop
         )
         await self.start_tasks()
-        if self._on_ready:
-            await self._on_ready()
+        await self._on_ready()
         await self.main_loop()
 
     async def main_loop(self) -> None:
@@ -68,8 +67,7 @@ class Server(Base):
             for con in client_copy:
                 if not con.running:
                     self.clients.remove(con)
-                    if self._on_disconnect:
-                        await self._on_disconnect(con)
+                    await self._on_disconnect(con)
                     continue
                 recv = con.read()
                 if recv is not None:
@@ -92,5 +90,4 @@ class Server(Base):
         con.start()
         con.send('set_id', con.id, event_type='system')
         self.clients.append(con)
-        if self._on_connect:
-            await self._on_connect(con)
+        await self._on_connect(con)
