@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="socketgame",
-    version="1.3.4",
+    version="1.3.4.1",
     description="Create fast LAN games easily",
     long_description=README,
     long_description_content_type="text/markdown",
