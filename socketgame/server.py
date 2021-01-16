@@ -92,5 +92,5 @@ class Server(Base):
         con.start()
         con.send('set_id', con.id, event_type='system')
         self.clients.append(con)
-        if self._on_ready:
+        if self._on_connect:
             await self._on_connect(con)
