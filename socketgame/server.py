@@ -1,18 +1,18 @@
 import asyncio
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Callable, Awaitable
 
 from .base import Base
 from .connection import Connection
 
 
 class Server(Base):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
         self.clients: List[Connection] = []
-        self._on_connect: callable = None
-        self._on_disconnect: callable = None
-        self._on_ready: callable = None
+        self._on_connect: Optional[Callable[[Connection], Awaitable[None]]] = None
+        self._on_disconnect: Optional[Callable[[Connection], Awaitable[None]]] = None
+        self._on_ready: Optional[Callable[[], Awaitable[None]]] = None
 
         self._current_id: int = 0
 
@@ -25,13 +25,13 @@ class Server(Base):
         for c in self.clients:
             c.send(event, data)
 
-    def on_connection(self, func: callable) -> None:
+    def on_connection(self, func: Callable[[Connection], Awaitable[None]]) -> None:
         self._on_connect = func
 
-    def on_disconnect(self, func: callable) -> None:
+    def on_disconnect(self, func: Callable[[Connection], Awaitable[None]]) -> None:
         self._on_disconnect = func
 
-    def on_ready(self, func: callable) -> None:
+    def on_ready(self, func: Callable[[], Awaitable[None]]) -> None:
         self._on_ready = func
 
     def run(self) -> None:
@@ -48,7 +48,7 @@ class Server(Base):
             await c.stop()
         exit(-1)
 
-    def _get_id(self) -> None:
+    def _get_id(self) -> int:
         self._current_id += 1
         return self._current_id - 1
 

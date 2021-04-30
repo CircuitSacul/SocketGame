@@ -1,20 +1,22 @@
 import asyncio
-from typing import Any
+from typing import Any, Callable, Awaitable, Optional
 
 from .base import Base
 from .connection import Connection
 
 
 class Client(Base):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self.server: Connection = None
-        self.id: int = None
+        self.server: Optional[Connection] = None
+        self.id: Optional[int] = None
 
-        self._on_ready: callable = None
+        self._on_ready: Optional[Callable[[], Awaitable[None]]] = None
 
     def send(self, event: str, data: Any) -> None:
+        if self.server is None:
+            raise Exception("Server is None.")
         self.server.send(event, data)
 
     def run(self) -> None:
@@ -38,10 +40,13 @@ class Client(Base):
 
     async def stop(self) -> None:
         self.stop_tasks()
-        await self.server.stop()
+        if self.server is not None:
+            await self.server.stop()
         exit(-1)
 
     async def main_loop(self) -> None:
+        if self.server is None:
+            raise Exception("Server is None.")
         while True:
             if not self.server.running:
                 break

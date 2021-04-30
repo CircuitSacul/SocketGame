@@ -1,6 +1,6 @@
 import asyncio
 import json
-from typing import Any
+from typing import Any, List, Optional
 
 
 class Connection:
@@ -14,14 +14,14 @@ class Connection:
         self.reader = reader
         self.writer = writer
 
-        self._recv_queue = []
-        self._send_queue = []
+        self._recv_queue: List[str] = []
+        self._send_queue: List[str] = []
 
         self.loop = loop
 
         self.running = True
 
-        self.id = None
+        self.id: Optional[int] = None
         self.begins = begins
 
         self._loop_task = None

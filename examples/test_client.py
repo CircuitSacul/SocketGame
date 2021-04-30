@@ -1,22 +1,21 @@
 import asyncio
+from socketgame.connection import Connection
 import sys
+from typing import Any, Dict
 
 import pygame
 
 from socketgame.client import Client
 
-
-SCREEN = pygame.display.set_mode((500, 500))
-pygame.init()
-
-
-game_data = None
+game_data: Dict[Any, Any] = {}
 
 host = input("Server IP Address: ")
 port = int(input("Server Port Number: "))
 
-
 client = Client(host=host, port=port)
+
+pygame.init()
+SCREEN = pygame.display.set_mode((500, 500))
 
 
 def draw() -> None:
@@ -28,14 +27,15 @@ def draw() -> None:
 
 
 @client.event(name='set_data')
-async def set_data(con, data) -> None:
+async def set_data(con: Connection, data: Dict[Any, Any]) -> None:
+    print("setting data")
     global game_data
     game_data = data
 
 
 @client.task
 async def game_loop() -> None:
-    while game_data is None:
+    while game_data == {}:
         await asyncio.sleep(0.1)
 
     while True:

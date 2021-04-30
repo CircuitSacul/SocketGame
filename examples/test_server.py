@@ -1,6 +1,7 @@
 import asyncio
 
-from socketgame.server import Server
+from socketgame import Server, Connection
+from typing import Dict, Any
 
 
 host = input("Host: ")
@@ -8,7 +9,7 @@ port = int(input("Port: "))
 
 server = Server(host=host, port=port)
 
-game_data = {'players': {}}
+game_data: Dict[str, Dict[Any, Any]] = {'players': {}}
 # Structure: {'players': {id: {'x': x_pos, 'y': y_pos}, ...}}
 
 
@@ -18,19 +19,19 @@ async def on_ready() -> None:
 
 
 @server.on_connection
-async def on_connect(con) -> None:
+async def on_connect(con: Connection) -> None:
     game_data['players'][con.id] = {'x': 0, 'y': 0}
     print("Client Connected:", con.id)
 
 
 @server.on_disconnect
-async def on_disconnect(con) -> None:
+async def on_disconnect(con: Connection) -> None:
     del game_data['players'][con.id]
     print("Client Disconnected:", con.id)
 
 
 @server.event(name='move')
-async def on_player_move(con, data) -> None:
+async def on_player_move(con: Connection, data: Dict[Any, Any]) -> None:
     x_move = data['x']
     y_move = data['y']
     if x_move < -1 or x_move > 1:

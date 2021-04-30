@@ -1,5 +1,9 @@
 import asyncio
-from typing import Dict, List, Any
+import typing
+from typing import Dict, List, Any, Optional, Callable, Awaitable
+
+if typing.TYPE_CHECKING:
+    from .connection import Connection
 
 
 class Base:
@@ -8,23 +12,23 @@ class Base:
         self,
         host: str = '127.0.0.1',
         port: int = 65432,
-        loop: asyncio.AbstractEventLoop = None
+        loop: Optional[asyncio.AbstractEventLoop] = None
     ) -> None:
         self.host = host
         self.port = port
 
         self.loop = loop or asyncio.get_event_loop()
 
-        self.events: Dict[str, callable] = {}
-        self.tasks: List[callable] = []
-        
-        self._running_tasks: List[asyncio.Future] = []
+        self.events: Dict[str, List[Callable[["Connection", Any], Awaitable[None]]]] = {}
+        self.tasks: List[Callable[[], Awaitable[None]]] = []
 
-    def task(self, func: callable) -> None:
+        self._running_tasks: List[asyncio.Future[Any]] = []
+
+    def task(self, func: Callable[[], Awaitable[None]]) -> None:
         self.tasks.append(func)
 
-    def event(self, name: str = None) -> callable:
-        def wrapper(func: callable) -> callable:
+    def event(self, name: Optional[str] = None) -> Callable[[Callable[["Connection", Any], Awaitable[None]]], Callable[["Connection", Any], Awaitable[None]]]:
+        def wrapper(func: Callable[["Connection", Any], Awaitable[None]]) -> Callable[["Connection", Any], Awaitable[None]]:
             event_name = name or func.__name__
 
             self.events.setdefault(event_name, [])
